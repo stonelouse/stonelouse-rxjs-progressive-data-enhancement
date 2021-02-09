@@ -25,7 +25,7 @@ function getPokemon(name: string) {
   /* Creates an Observable from an Ajax (fetch) request */
   return ajax(`https://pokeapi.co/api/v2/pokemon/${name}`).pipe(
     map(pokemon => pokemon.response),
-    delay(1500)
+    delay(500)
   );
 }
 
@@ -34,7 +34,7 @@ function getEvolutions(id: number) {
  
   return ajax(`https://pokeapi.co/api/v2/evolution-chain/${id}`).pipe(
     map(pokemon => pokemon.response),
-    delay(1500)
+    delay(2000)
   );
 }
 
@@ -57,19 +57,36 @@ function addPokemonToUi(pokemon) {
    ... emits events of a specific type 
    ... coming from the given event target. 
 
-   search for 'pikachu'
+   search for 'pikachu', 'bulbasaur'
+ */
+/*
+  First approach
+  ----p---------e---
  */
 fromEvent(searchBtn, 'click').pipe(
-  map(e=>searchInput.value),
-  exhaustMap((name) => getPokemon(name).pipe(
-    switchMap(pokemon => {
-      const pokemon$ = of(pokemon);
-      const evolution$ = getEvolutions(pokemon.id).pipe(
-        map(evolutions => {
-          return addEvolutionsToPokemon(pokemon, evolutions);
-        }));
-      return merge(pokemon$, evolution$).pipe();
-    }),
-    takeUntil(fromEvent(searchInput, 'input'))
-  )),
+    map(e=>searchInput.value),
+    switchMap(name => {
+      return getPokemon(name).pipe(
+        switchMap(pokemon => {
+          return getEvolutions(pokemon.id).pipe(
+            map(evolutions => addEvolutionsToPokemon(pokemon, evolutions))
+          )
+        })
+      )
+    })
 ).subscribe(addPokemonToUi);
+
+// fromEvent(searchBtn, 'click').pipe(
+//   map(e=>searchInput.value),
+//   exhaustMap((name) => getPokemon(name).pipe(
+//     switchMap(pokemon => {
+//       const pokemon$ = of(pokemon);
+//       const evolution$ = getEvolutions(pokemon.id).pipe(
+//         map(evolutions => {
+//           return addEvolutionsToPokemon(pokemon, evolutions);
+//         }));
+//       return merge(pokemon$, evolution$).pipe();
+//     }),
+//     takeUntil(fromEvent(searchInput, 'input'))
+//   )),
+// ).subscribe(addPokemonToUi);
