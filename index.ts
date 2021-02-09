@@ -43,7 +43,7 @@ function addEvolutionsToPokemon(pokemon, evolutions) {
 }
 
 function addPokemonToUi(pokemon) {
-  console.log(pokemon);
+  console.log(pokemon.id, pokemon.name);
 
   result.style.display = 'block';
   pokemonName.innerText = pokemon.name;
