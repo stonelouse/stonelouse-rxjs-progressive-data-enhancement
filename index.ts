@@ -59,23 +59,46 @@ function addPokemonToUi(pokemon) {
 
    search for 'pikachu', 'bulbasaur'
  */
-/*
+/* ----------------------------------------------------------------
   First approach
-  ----p---------e---
+  ----p--------pe--- // one stream
+ */
+// fromEvent(searchBtn, 'click').pipe(
+//     map(e=>searchInput.value),
+//     switchMap(name => {
+//       return getPokemon(name).pipe(
+//         switchMap(pokemon => {
+//           return getEvolutions(pokemon.id).pipe(
+//             map(evolutions => addEvolutionsToPokemon(pokemon, evolutions))
+//           )
+//         })
+//       )
+//     })
+// ).subscribe(addPokemonToUi);
+
+/* ----------------------------------------------------------------
+  Second approach
+  ----p------------- // one stream emits pokemon immediately of()
+  -------------pe--- // one stream emits the enriched pokemon 
+  ----p--------pe--- // and combine these streames (merge())
  */
 fromEvent(searchBtn, 'click').pipe(
     map(e=>searchInput.value),
     switchMap(name => {
       return getPokemon(name).pipe(
         switchMap(pokemon => {
-          return getEvolutions(pokemon.id).pipe(
+          const pokemon$ = of(pokemon);
+          const evolution$ = getEvolutions(pokemon.id).pipe(
             map(evolutions => addEvolutionsToPokemon(pokemon, evolutions))
           )
-        })
+          return merge(pokemon$, evolution$)
+        }),
       )
     })
 ).subscribe(addPokemonToUi);
 
+/* ----------------------------------------------------------------
+ */
 // fromEvent(searchBtn, 'click').pipe(
 //   map(e=>searchInput.value),
 //   exhaustMap((name) => getPokemon(name).pipe(
