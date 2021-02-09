@@ -25,7 +25,7 @@ function getPokemon(name: string) {
   /* Creates an Observable from an Ajax (fetch) request */
   return ajax(`https://pokeapi.co/api/v2/pokemon/${name}`).pipe(
     map(pokemon => pokemon.response),
-    delay(500)
+    delay(3000)
   );
 }
 
@@ -82,9 +82,27 @@ function addPokemonToUi(pokemon) {
   -------------pe--- // one stream emits the enriched pokemon 
   ----p--------pe--- // and combine these streames (merge())
  */
+// fromEvent(searchBtn, 'click').pipe(
+//     map(e=>searchInput.value),
+//     switchMap(name => {
+//       return getPokemon(name).pipe(
+//         switchMap(pokemon => {
+//           const pokemon$ = of(pokemon);
+//           const evolution$ = getEvolutions(pokemon.id).pipe(
+//             map(evolutions => addEvolutionsToPokemon(pokemon, evolutions))
+//           )
+//           return merge(pokemon$, evolution$)
+//         }),
+//       )
+//     })
+// ).subscribe(addPokemonToUi);
+
+/* ----------------------------------------------------------------
+  Third approach
+ */
 fromEvent(searchBtn, 'click').pipe(
     map(e=>searchInput.value),
-    switchMap(name => {
+    exhaustMap(name => {
       return getPokemon(name).pipe(
         switchMap(pokemon => {
           const pokemon$ = of(pokemon);
