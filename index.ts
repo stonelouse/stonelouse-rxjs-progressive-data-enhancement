@@ -116,6 +116,7 @@ fromEvent(searchBtn, 'click').pipe(
 ).subscribe(addPokemonToUi);
 
 /* ----------------------------------------------------------------
+  Fourth approach
  */
 // fromEvent(searchBtn, 'click').pipe(
 //   map(e=>searchInput.value),
