@@ -100,35 +100,35 @@ function addPokemonToUi(pokemon) {
 /* ----------------------------------------------------------------
   Third approach
  */
-fromEvent(searchBtn, 'click').pipe(
-    map(e=>searchInput.value),
-    exhaustMap(name => {
-      return getPokemon(name).pipe(
-        switchMap(pokemon => {
-          const pokemon$ = of(pokemon);
-          const evolution$ = getEvolutions(pokemon.id).pipe(
-            map(evolutions => addEvolutionsToPokemon(pokemon, evolutions))
-          )
-          return merge(pokemon$, evolution$)
-        }),
-      )
-    })
-).subscribe(addPokemonToUi);
+// fromEvent(searchBtn, 'click').pipe(
+//     map(e=>searchInput.value),
+//     exhaustMap(name => {
+//       return getPokemon(name).pipe(
+//         switchMap(pokemon => {
+//           const pokemon$ = of(pokemon);
+//           const evolution$ = getEvolutions(pokemon.id).pipe(
+//             map(evolutions => addEvolutionsToPokemon(pokemon, evolutions))
+//           )
+//           return merge(pokemon$, evolution$)
+//         }),
+//       )
+//     })
+// ).subscribe(addPokemonToUi);
 
 /* ----------------------------------------------------------------
   Fourth approach
  */
-// fromEvent(searchBtn, 'click').pipe(
-//   map(e=>searchInput.value),
-//   exhaustMap((name) => getPokemon(name).pipe(
-//     switchMap(pokemon => {
-//       const pokemon$ = of(pokemon);
-//       const evolution$ = getEvolutions(pokemon.id).pipe(
-//         map(evolutions => {
-//           return addEvolutionsToPokemon(pokemon, evolutions);
-//         }));
-//       return merge(pokemon$, evolution$).pipe();
-//     }),
-//     takeUntil(fromEvent(searchInput, 'input'))
-//   )),
-// ).subscribe(addPokemonToUi);
+fromEvent(searchBtn, 'click').pipe(
+  map(e=>searchInput.value),
+  exhaustMap((name) => getPokemon(name).pipe(
+    switchMap(pokemon => {
+      const pokemon$ = of(pokemon);
+      const evolution$ = getEvolutions(pokemon.id).pipe(
+        map(evolutions => {
+          return addEvolutionsToPokemon(pokemon, evolutions);
+        }));
+      return merge(pokemon$, evolution$).pipe();
+    }),
+    takeUntil(fromEvent(searchInput, 'input'))
+  )),
+).subscribe(addPokemonToUi);
